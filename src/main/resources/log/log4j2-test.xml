@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 设置log4j2的自身log级别为warn -->
+<!-- ERROR > WARN > INFO > DEBUG > TRACE -->
+<configuration status="WARN" monitorInterval="600" packages="org.ysten.gdog.log4j2">
+    <Properties>
+        <!--日志文件保存路径-->
+        <Property name="LOG_PATH">/data/logs/</Property>
+        <!--应用名称-->
+        <Property name="APP_NAME">vas-adapter-api</Property>
+        <!--日志文件最大容量，超过最大容量后日志文件分割-->
+        <Property name="MAX_FILE_SIZE">100MB</Property>
+        <!--分割日志的最大次数-->
+        <Property name="I_MAX">1000</Property>
+        <!--日志输出模版-->
+        <Property name="PATTERN_LAYOUT">%d [%X{traceId}] [%t] %zb %level (%F %M %L) - %msg%n
+        </Property>
+    </Properties>
+    <appenders>
+        <!-- 控制台日志 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+        </console>
+        <!-- 输出日志级别为 debug 的日志 -->
+        <RollingFile name="RollingFileDebug" fileName="${LOG_PATH}/${APP_NAME}_debug.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_debug_%d{yyyy-MM-dd}_%i.log">
+            <Filters>
+                <ThresholdFilter level="DEBUG"/>
+                <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+        <!-- 输出日志级别为 info 的日志 -->
+        <RollingFile name="RollingFileInfo" fileName="${LOG_PATH}/${APP_NAME}_info.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_info_%d{yyyy-MM-dd}_%i.log">
+            <Filters>
+                <ThresholdFilter level="INFO"/>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+
+        <!-- 输出日志级别为 warn 的日志 -->
+        <RollingFile name="RollingFileWarn" fileName="${LOG_PATH}/${APP_NAME}_warn.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_warn_%d{yyyy-MM-dd}_%i.log">
+            <Filters>
+                <ThresholdFilter level="WARN"/>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <RegexFilter regex=".*QualityInfo.*" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+
+        <!-- 输出日志级别为 error 的日志 -->
+        <RollingFile name="RollingFileError" fileName="${LOG_PATH}/${APP_NAME}_error.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_error_%d{yyyy-MM-dd}_%i.log">
+            <ThresholdFilter level="ERROR"/>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+    </appenders>
+
+    <loggers>
+        <!--过滤掉spring和mybatis的一些无用的DEBUG信息-->
+        <AsyncLogger name="org.springframework" level="INFO"/>
+        <AsyncLogger name="org.mybatis" level="INFO"/>
+        <AsyncLogger level="INFO" name="org.apache.dubbo"/>
+        <asyncRoot includeLocation="true" level="INFO" additivity="false">
+            <!--控制台日志，生产环境关闭-->
+            <!--            <appender-ref ref="Console"/>-->
+            <!--DEBUG日志，生产环境关闭-->
+            <!--<appender-ref ref="RollingFileDebug"/>-->
+            <!--INFO日志，生产环境开启-->
+            <appender-ref ref="RollingFileInfo"/>
+            <!--WARN日志，生产环境开启-->
+            <appender-ref ref="RollingFileWarn"/>
+            <!--ERROR日志，生产环境开启-->
+            <appender-ref ref="RollingFileError"/>
+        </asyncRoot>
+    </loggers>
+</configuration>

@@ -1,0 +1,2 @@
+consumerRpcTraceFilter=com.test.filter.ConsumerRpcTraceFilter
+providerRpcTraceFilter=com.test.filter.ProviderRpcTraceFilter

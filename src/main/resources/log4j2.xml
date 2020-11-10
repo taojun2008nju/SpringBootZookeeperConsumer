@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration monitorInterval="60" packages="org.ysten.gdog.log4j2" status="info">
+    <Properties>
+        <Property name="LOG_PATH">/data/logs</Property>
+        <Property name="APP_NAME">vas-adapter-api</Property>
+        <Property name="PATTERN_LAYOUT">%d [%X{traceId}] [%t] %zb %level (%F %M %L) - %msg%n</Property>
+        <Property name="LOG_PATTERN_CONSOLE">%d [%t] %zb %level (%F %M %L) %X{logid} -%msg%n</Property>
+        <Property name="SERVER_PORT">default</Property>
+        <!--日志文件最大容量，超过最大容量后日志文件分割-->
+        <Property name="MAX_FILE_SIZE">50MB</Property>
+        <!--分割日志的最大次数-->
+        <Property name="I_MAX">40</Property>
+    </Properties>
+
+    <appenders>
+        <console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+        </console>
+        <RollingFile fileName="${LOG_PATH}/${APP_NAME}_debug.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_debug_%d{yyyy-MM-dd}_%i.log"
+          name="RollingFileDebug">
+            <Filters>
+                <ThresholdFilter level="DEBUG"/>
+                <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+        <RollingFile fileName="${LOG_PATH}/${APP_NAME}_info.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_info_%d{yyyy-MM-dd}_%i.log"
+          name="RollingFileInfo">
+            <Filters>
+                <ThresholdFilter level="INFO"/>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+
+        <RollingFile fileName="${LOG_PATH}/${APP_NAME}_warn.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_warn_%d{yyyy-MM-dd}_%i.log"
+          name="RollingFileWarn">
+            <ThresholdFilter level="WARN"/>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+
+        <RollingFile fileName="${LOG_PATH}/${APP_NAME}_error.log"
+          filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}_error_%d{yyyy-MM-dd}_%i.log"
+          name="RollingFileError">
+            <ThresholdFilter level="ERROR"/>
+            <PatternLayout pattern="${PATTERN_LAYOUT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${I_MAX}"/>
+        </RollingFile>
+    </appenders>
+
+    <loggers>
+        <AsyncLogger level="INFO" name="org.springframework"/>
+        <AsyncLogger level="INFO" name="org.mybatis"/>
+        <AsyncLogger level="INFO" name="com.ysten"/>
+        <AsyncLogger level="INFO" name="org.mybatis"/>
+        <AsyncLogger level="INFO" name="org.apache.dubbo"/>
+        <asyncRoot additivity="false" includeLocation="true" level="INFO">
+            <!--控制台日志，生产环境关闭-->
+            <appender-ref ref="Console"/>
+            <appender-ref ref="RollingFileDebug"/>
+            <appender-ref ref="RollingFileInfo"/>
+            <appender-ref ref="RollingFileWarn"/>
+            <appender-ref ref="RollingFileError"/>
+        </asyncRoot>
+    </loggers>
+</configuration>
