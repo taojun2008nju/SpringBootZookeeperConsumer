@@ -1,5 +1,6 @@
 package com.test.interceptor;
 
+import com.test.constant.Constants;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,15 +17,10 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 @Component
 public class TraceInterceptor extends HandlerInterceptorAdapter {
 
-    /**
-     * 日志追踪id
-     */
-    String LOG_TRACE_ID = "traceId";
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         // "traceId"
-        MDC.put(LOG_TRACE_ID, UUID.randomUUID().toString().replace("-", ""));
+        MDC.put(Constants.LOG_TRACE_ID, UUID.randomUUID().toString().replace("-", ""));
         return true;
     }
 }
