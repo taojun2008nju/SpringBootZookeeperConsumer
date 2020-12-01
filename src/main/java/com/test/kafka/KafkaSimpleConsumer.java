@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,11 +31,12 @@ public class KafkaSimpleConsumer {
 
     @KafkaListener(topics = KafkaConstants.TOPIC_SIMPLE)
 //    @KafkaListener(topics = KafkaConstants.TOPIC_SIMPLE, topicPartitions = { @TopicPartition(topic = KafkaConstants.TOPIC_SIMPLE, partitions = { "0" }) })
-    public void consumer1(ConsumerRecord<?, ?> record) {
+    public void consumer1(ConsumerRecord<?, ?> record, Acknowledgment ack) {
         log.info("consumer1 kafka的topic: {}", record.topic());
         log.info("consumer1 kafka的key: {}", record.key());
         log.info("consumer1 kafka的value: {}", record.value().toString());
         log.info("consumer1 kafka的partition: {}", record.partition());
+        ack.acknowledge();
     }
 
 //    @KafkaListener(topics = KafkaConstants.TOPIC_SIMPLE, topicPartitions = { @TopicPartition(topic = KafkaConstants.TOPIC_SIMPLE, partitions = { "1" }) })
