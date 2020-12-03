@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CommonApiController {
 
-    @Reference
+    @Reference(parameters = {"isHystrixOpen", "true", "fallbackClass", "com.test.service.TestServiceFallbackImpl"})
     private TestService testService;
 
     @RequestMapping(value = "/testApi")
     @ResponseBody
-    @HystrixCommand(
+    /*@HystrixCommand(
         // commandProperties熔断的⼀些细节属性配置
         commandProperties = {
             // 每⼀个属性都是⼀个HystrixProperty，HystrixCommandProperties可以获取配置信息
@@ -35,7 +35,7 @@ public class CommonApiController {
             @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds",value = "3000")
         },
         fallbackMethod = "testApiFallback",
-        ignoreExceptions = {ArithmeticException.class})
+        ignoreExceptions = {ArithmeticException.class})*/
     public String testApi() throws Exception {
         log.info("Method:testApi");
         String testResult = testService.test("123");
